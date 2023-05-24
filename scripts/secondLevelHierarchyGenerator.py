@@ -27,7 +27,7 @@ def generate_hierarchy():
             if(state_identifier in stateIdentifier_geonameId_map):
                 geoname_state_id = stateIdentifier_geonameId_map[state_identifier]
 
-            output.write(geoname_city_id + "\t" + geoname_state_id + "\n")
+            output.write(geoname_state_id + "\t" + geoname_city_id + "\n")
     output.close()
 
 parse_admin1codes_file("data/admin1CodesASCII.txt")
