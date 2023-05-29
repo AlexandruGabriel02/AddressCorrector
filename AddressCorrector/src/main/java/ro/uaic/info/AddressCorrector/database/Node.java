@@ -1,16 +1,16 @@
 package ro.uaic.info.AddressCorrector.database;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ro.uaic.info.AddressCorrector.models.NodeType;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
 @AllArgsConstructor
+@Setter
+@Getter
 public class Node {
+
     private String defaultEntityName;
     private NodeType type;
     private Node parentNode;

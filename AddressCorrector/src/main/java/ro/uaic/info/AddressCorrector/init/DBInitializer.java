@@ -26,14 +26,14 @@ public class DBInitializer implements CommandLineRunner {
         return node;
     }
 
-    private void mapNameToNode(Node node, String name, MultimapDatabase multimap) {
-        multimap.add(name, node);
+    private void mapNameToNode(Node node, String name) {
+        MultimapDatabase.INSTANCE.add(name.toLowerCase(), node);
     }
 
-    private void setAlternateNames(Node node, String names, MultimapDatabase multimap) {
+    private void setAlternateNames(Node node, String names) {
         String[] tokenNames = names.split(",");
         for (String name : tokenNames) {
-            mapNameToNode(node, name, multimap);
+            mapNameToNode(node, name);
         }
     }
 
@@ -46,26 +46,24 @@ public class DBInitializer implements CommandLineRunner {
     }
 
     @Bean
-    public MultimapDatabase parseAllEntities() {
-        MultimapDatabase multimap = new MultimapDatabase();
+    public void parseAllEntities() {
         try(BufferedReader in = new BufferedReader(new FileReader(allEntitiesFileName))) {
             String line;
             while ((line = in.readLine()) != null) {
                 String[] tokens = line.split("\t");
                 Node createdNode = createNewNode(tokens[0]);
 
-                mapNameToNode(createdNode, tokens[1], multimap);
+                mapNameToNode(createdNode, tokens[1]);
                 createdNode.setDefaultEntityName(tokens[1]);
 
-                mapNameToNode(createdNode, tokens[2], multimap);
+                mapNameToNode(createdNode, tokens[2]);
 
-                setAlternateNames(createdNode, tokens[3], multimap);
+                setAlternateNames(createdNode, tokens[3]);
             }
         }
         catch(IOException e) {
             log.error("IO exception at database creation: " + e.getMessage());
         }
-        return multimap;
     }
 
     public void createGraph() {
@@ -112,7 +110,7 @@ public class DBInitializer implements CommandLineRunner {
     public void run(String... args) {
         createGraph();
         assignNodeTypes();
-        log.info("Initialized!");
         idToNodeMap = null;
+        log.info("Initialized!");
     }
 }
