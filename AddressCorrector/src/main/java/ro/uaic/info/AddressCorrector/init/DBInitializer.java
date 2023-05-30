@@ -30,6 +30,9 @@ public class DBInitializer implements CommandLineRunner {
     }
 
     private void mapNameToNode(Node node, String name) {
+        if(name.isEmpty()) {
+            return;
+        }
         tokenToNodeHashmap.put(name.toLowerCase(), node);
     }
 
