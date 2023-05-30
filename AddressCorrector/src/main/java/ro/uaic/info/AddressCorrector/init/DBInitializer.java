@@ -1,5 +1,7 @@
 package ro.uaic.info.AddressCorrector.init;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +18,7 @@ import java.util.Map;
 @Log4j2
 public class DBInitializer implements CommandLineRunner {
     private Map<String, Node> idToNodeMap = new HashMap<>();
+    private Multimap<String, Node> tokenToNodeHashmap = HashMultimap.create();
     private final static String allEntitiesFileName = "src/main/resources/data/allEuropeanEntities.txt";
     private final static String hierarchyFileName = "src/main/resources/data/secondLevelHierarchy.txt";
 
@@ -27,7 +30,7 @@ public class DBInitializer implements CommandLineRunner {
     }
 
     private void mapNameToNode(Node node, String name) {
-        MultimapDatabase.INSTANCE.add(name.toLowerCase(), node);
+        tokenToNodeHashmap.put(name.toLowerCase(), node);
     }
 
     private void setAlternateNames(Node node, String names) {
@@ -100,17 +103,23 @@ public class DBInitializer implements CommandLineRunner {
         }
     }
 
-    public void assignNodeTypes() {
+    private void assignNodeTypes() {
         for (Node node : idToNodeMap.values()) {
             assignType(node);
         }
+    }
+
+    private void copyHashmapToDatabase() {
+        MultimapDatabase.INSTANCE.getTokenToNodeMap().putAll(tokenToNodeHashmap);
     }
 
     @Override
     public void run(String... args) {
         createGraph();
         assignNodeTypes();
+        copyHashmapToDatabase();
         idToNodeMap = null;
+        tokenToNodeHashmap = null;
         log.info("Initialized!");
     }
 }
