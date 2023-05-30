@@ -6,6 +6,7 @@ import ro.uaic.info.AddressCorrector.database.Node;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Data
 @AllArgsConstructor
@@ -23,34 +24,31 @@ public class NormalizedAddress {
 
     public void add(Entry entry, NodeType type) {
         switch (type) {
-            case COUNTRY:
-                countries.add(entry);
-                break;
-            case STATE:
-                states.add(entry);
-                break;
-            case CITY:
-                cities.add(entry);
-                break;
-            default:
-                break;
-        }
-    }
-    public Entry containsStateNode(Node state) {
-        for (Entry entry : states) {
-            if (entry.getNode().equals(state)) {
-                return entry;
+            case COUNTRY -> countries.add(entry);
+            case STATE -> states.add(entry);
+            case CITY -> cities.add(entry);
+            default -> {
             }
         }
-        return null;
     }
 
-    public Entry containsCountryNode(Node state) {
-        for (Entry entry : countries) {
-            if (entry.getNode().equals(state)) {
-                return entry;
+    private List<Entry> getCorrespondingList(NodeType type) {
+        return switch (type) {
+            case COUNTRY -> countries;
+            case STATE -> states;
+            case CITY -> cities;
+            default -> null;
+        };
+    }
+
+    public Optional<Entry> getContainingNode(Node node) {
+        Entry entry = null;
+        for (Entry candEntry : getCorrespondingList(node.getType())) {
+            if (candEntry.getNode().equals(node)) {
+                entry = candEntry;
+                break;
             }
         }
-        return null;
+        return Optional.ofNullable(entry);
     }
 }
