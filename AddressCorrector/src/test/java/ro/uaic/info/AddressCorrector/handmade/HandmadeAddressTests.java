@@ -15,6 +15,15 @@ public class HandmadeAddressTests {
     @Autowired
     private AddressService addressService;
 
+    void assertAddress(Address inputAddress, Address expectedAddress) {
+        List<Address> correctedAddresses = addressService
+                .getCorrectedAddress(inputAddress)
+                .stream()
+                .map(correctedAddress -> (Address) correctedAddress)
+                .toList();
+
+        assertTrue(correctedAddresses.contains(expectedAddress));
+    }
     @Test
     void givenRomanianAndItalianAddress_whenRomaniaInForeignLanguage_thenShouldReturnRomanianAddress() {
         String countryField = "Романија;   France";
@@ -24,13 +33,7 @@ public class HandmadeAddressTests {
         Address inputAddress = new Address(countryField, stateField, cityField);
         Address expectedAddress = new Address("România", "Galaţi", "Tecuci");
 
-        List<Address> correctedAddresses = addressService
-                .getCorrectedAddress(inputAddress)
-                .stream()
-                .map(correctedAddress -> (Address) correctedAddress)
-                .toList();
-
-        assertTrue(correctedAddresses.contains(expectedAddress));
+        assertAddress(inputAddress, expectedAddress);
     }
 
     @Test
@@ -42,13 +45,7 @@ public class HandmadeAddressTests {
         Address inputAddress = new Address(countryField, stateField, cityField);
         Address expectedAddress = new Address("Kingdom of Spain", "Catalunya", "Barcelona");
 
-        List<Address> correctedAddresses = addressService
-                .getCorrectedAddress(inputAddress)
-                .stream()
-                .map(correctedAddress -> (Address) correctedAddress)
-                .toList();
-
-        assertTrue(correctedAddresses.contains(expectedAddress));
+        assertAddress(inputAddress, expectedAddress);
     }
 
     @Test
@@ -60,13 +57,7 @@ public class HandmadeAddressTests {
         Address inputAddress = new Address(countryField, stateField, cityField);
         Address expectedAddress = new Address("Kingdom of Denmark", "Region Hovedstaden", "Copenhagen");
 
-        List<Address> correctedAddresses = addressService
-                .getCorrectedAddress(inputAddress)
-                .stream()
-                .map(correctedAddress -> (Address) correctedAddress)
-                .toList();
-
-        assertTrue(correctedAddresses.contains(expectedAddress));
+        assertAddress(inputAddress, expectedAddress);
     }
 
     @Test
@@ -78,12 +69,30 @@ public class HandmadeAddressTests {
         Address inputAddress = new Address(countryField, stateField, cityField);
         Address expectedAddress = new Address("România", "Iaşi", "Paşcani");
 
-        List<Address> correctedAddresses = addressService
-                .getCorrectedAddress(inputAddress)
-                .stream()
-                .map(correctedAddress -> (Address) correctedAddress)
-                .toList();
+        assertAddress(inputAddress, expectedAddress);
+    }
 
-        assertTrue(correctedAddresses.contains(expectedAddress));
+    @Test
+    void givenRomanianAndFrenchAddress_whenFrenchFieldsOnCorrectPosition_thenShouldReturnFrenchAddress() {
+        String countryField = "pascani - franta";
+        String stateField = "iasi ; ile-de-france";
+        String cityField = "romania ,,paris";
+
+        Address inputAddress = new Address(countryField, stateField, cityField);
+        Address expectedAddress = new Address("Republic of France", "Île-de-France", "Paris");
+
+        assertAddress(inputAddress, expectedAddress);
+    }
+
+    @Test
+    void givenThreeDifferentCities_whenEachOnDifferentField_thenShouldReturnTheOneOnTheCorrectField() {
+        String countryField = "oslo";
+        String stateField = "atena";
+        String cityField = "klaipeda";
+
+        Address inputAddress = new Address(countryField, stateField, cityField);
+        Address expectedAddress = new Address("Republic of Lithuania", "Klaipėda County", "Klaipėda");
+
+        assertAddress(inputAddress, expectedAddress);
     }
 }
