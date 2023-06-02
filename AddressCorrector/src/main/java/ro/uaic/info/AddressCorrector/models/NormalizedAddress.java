@@ -44,9 +44,12 @@ public class NormalizedAddress {
     public Optional<Entry> getContainingNode(Node node) {
         Entry entry = null;
         for (Entry candEntry : getCorrespondingList(node.getType())) {
-            if (candEntry.getNode().equals(node)) {
+            if (!candEntry.getNode().equals(node)) {
+                continue;
+            }
+
+            if (entry == null || candEntry.isOnCorrectField()) {
                 entry = candEntry;
-                break;
             }
         }
         return Optional.ofNullable(entry);
