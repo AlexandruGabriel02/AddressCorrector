@@ -38,11 +38,10 @@ public class AddressCorrector {
                 break;
 
             CorrectedAddress correctedAddress = new CorrectedAddress();
-            if (!city.isOnCorrectField())
-                correctedAddress.lowerScoreByPriority();
 
             Node cityNode = city.getNode();
             correctedAddress.setCity(cityNode.getDefaultEntityName());
+            checkPenalization(city, city.getNode(), correctedAddress);
 
             Node stateNode = cityNode.getParentNode();
             setCorrectName(correctedAddress, stateNode);
@@ -57,7 +56,14 @@ public class AddressCorrector {
         return correctedAddresses;
     }
 
-
+    private void checkPenalization(Entry entry, Node node, CorrectedAddress correctedAddress) {
+        if (!entry.isOnCorrectField()) {
+            correctedAddress.lowerScoreByPriority();
+        }
+        if (!entry.getName().equalsIgnoreCase(node.getDefaultEntityName())) {
+            correctedAddress.lowerScoreByAlternateName();
+        }
+    }
     private void setCorrectName(CorrectedAddress correctedAddress, Node node) {
         Optional<Entry> entryOptional = normalizedAddress.getContainingNode(node);
         correctedAddress.setEntity(node.getDefaultEntityName(), node.getType());
@@ -66,8 +72,6 @@ public class AddressCorrector {
             return;
         }
         Entry entry = entryOptional.get();
-        if (!entry.isOnCorrectField()) {
-            correctedAddress.lowerScoreByPriority();
-        }
+        checkPenalization(entry, node, correctedAddress);
     }
 }
