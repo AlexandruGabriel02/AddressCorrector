@@ -19,8 +19,8 @@ import java.util.Map;
 public class DBInitializer implements CommandLineRunner {
     private Map<String, Node> idToNodeMap = new HashMap<>();
     private Multimap<String, Node> tokenToNodeHashmap = HashMultimap.create();
-    private final static String allEntitiesFileName = "src/main/resources/data/allEuropeanEntities.txt";
-    private final static String hierarchyFileName = "src/main/resources/data/secondLevelHierarchy.txt";
+    private final static String allEntitiesFileName = "/data/allEuropeanEntities.txt";
+    private final static String hierarchyFileName = "/data/secondLevelHierarchy.txt";
 
     private Node createNewNode(String id) {
         Node node = new Node();
@@ -53,7 +53,8 @@ public class DBInitializer implements CommandLineRunner {
 
     @Bean
     public void parseAllEntities() {
-        try(BufferedReader in = new BufferedReader(new FileReader(allEntitiesFileName))) {
+        try(InputStream is = getClass().getResourceAsStream(allEntitiesFileName);
+            BufferedReader in = new BufferedReader(new InputStreamReader(is))) {
             String line;
             while ((line = in.readLine()) != null) {
                 String[] tokens = line.split("\t");
@@ -73,7 +74,8 @@ public class DBInitializer implements CommandLineRunner {
     }
 
     public void createGraph() {
-        try(BufferedReader in = new BufferedReader(new FileReader(hierarchyFileName))) {
+        try(InputStream is = getClass().getResourceAsStream(hierarchyFileName);
+            BufferedReader in = new BufferedReader(new InputStreamReader(is))) {
             String line;
             while ((line = in.readLine()) != null) {
                 String[] ids = line.split("\t");
