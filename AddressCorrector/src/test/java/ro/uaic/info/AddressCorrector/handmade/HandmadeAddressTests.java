@@ -25,7 +25,7 @@ public class HandmadeAddressTests {
         assertTrue(correctedAddresses.contains(expectedAddress));
     }
     @Test
-    void givenRomanianAndItalianAddress_whenRomaniaInForeignLanguage_thenShouldReturnRomanianAddress() {
+    void givenRomanianAndItalianAddress_whenRomaniaInForeignLanguageAndItalyUnspecified_thenShouldReturnRomanianAddress() {
         String countryField = "Романија;   France";
         String stateField = "galati ,,random_garbage1244,, lombardia";
         String cityField = "tecuci, milano";
@@ -112,12 +112,73 @@ public class HandmadeAddressTests {
 
     @Test
     void givenTwoEqualScoringAddresses_whenOneIsNotAlternateName_thenShouldReturnThatAddress() {
-        String countryField = "România";
-        String stateField = "iasi Vaslui";
+        String countryField = "RO";
+        String stateField = "iasi Vaslui"; //iasi and vaslui are both cities and states
         String cityField = "-";
 
         Address inputAddress = new Address(countryField, stateField, cityField);
         Address expectedAddress = new Address("România", "Vaslui", "Vaslui");
+
+        assertAddress(inputAddress, expectedAddress);
+    }
+
+    @Test
+    void givenAddressWithNoCity_thenShouldReturnNoAddress() {
+        String countryField = "România";
+        String stateField = "- dasfgfsdgsdfg";
+        String cityField = "-";
+
+        Address inputAddress = new Address(countryField, stateField, cityField);
+
+        assertTrue(addressService.getCorrectedAddress(inputAddress).isEmpty());
+    }
+
+    @Test
+    void givenTwoEqualScoringAddresses_thenShouldReturnBoth() {
+        String countryField = "moldova";
+        String stateField = "cantemir";
+        String cityField = "acui de jos"; //"acui de jos" and "acui" are both cities in the same state
+
+        Address inputAddress = new Address(countryField, stateField, cityField);
+        Address expectedAddress1 = new Address("Republic of Moldova", "Cantemir", "Acui de Jos");
+        Address expectedAddress2 = new Address("Republic of Moldova", "Cantemir", "Acui");
+
+        assertAddress(inputAddress, expectedAddress1);
+        assertAddress(inputAddress, expectedAddress2);
+    }
+
+    @Test
+    void givenAddressState_whenLanguageIsKorean_thenShouldReturnThatAddress() {
+        String countryField = " - ";
+        String stateField = "부쿠레슈티"; //bucuresti
+        String cityField = " - ";
+
+        Address inputAddress = new Address(countryField, stateField, cityField);
+        Address expectedAddress = new Address("România", "București", "Bucharest");
+
+        assertAddress(inputAddress, expectedAddress);
+    }
+
+    @Test
+    void givenCountry_whenItIsAlsoACity_thenReturnTheCityAdress() {
+        String countryField = "romania";
+        String stateField = "-";
+        String cityField = "-";
+
+        Address inputAddress = new Address(countryField, stateField, cityField);
+        Address expectedAddress = new Address("Italian Republic", "Toscana", "Romania");
+
+        assertAddress(inputAddress, expectedAddress);
+    }
+
+    @Test
+    void givenRomanianAddress_whenCitySeparatedByPunctuationChars_thenShouldStillReturnThatCity() {
+        String countryField = "..Satu,,! mare";
+        String stateField = "RO";
+        String cityField = "??";
+
+        Address inputAddress = new Address(countryField, stateField, cityField);
+        Address expectedAddress = new Address("România", "Satu Mare", "Satu Mare");
 
         assertAddress(inputAddress, expectedAddress);
     }
