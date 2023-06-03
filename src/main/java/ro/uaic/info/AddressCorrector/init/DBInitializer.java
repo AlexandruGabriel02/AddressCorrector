@@ -120,9 +120,12 @@ public class DBInitializer implements CommandLineRunner {
     public void run(String... args) {
         createGraph();
         assignNodeTypes();
-        copyHashmapToDatabase();
         idToNodeMap = null;
+        System.gc();
+
+        copyHashmapToDatabase();
         tokenToNodeHashmap = null;
+        System.gc();
         log.info("Initialized!");
     }
 }
