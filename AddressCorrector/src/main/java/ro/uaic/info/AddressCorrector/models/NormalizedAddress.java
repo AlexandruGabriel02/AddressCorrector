@@ -48,6 +48,10 @@ public class NormalizedAddress {
                 continue;
             }
 
+            if (entry != null && entry.isOnCorrectField()) {
+                break;
+            }
+
             if (entry == null || candEntry.isOnCorrectField()) {
                 entry = candEntry;
             }

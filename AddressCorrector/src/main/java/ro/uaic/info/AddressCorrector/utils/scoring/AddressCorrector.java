@@ -62,6 +62,7 @@ public class AddressCorrector {
         }
         if (!entry.getName().equalsIgnoreCase(node.getDefaultEntityName())) {
             correctedAddress.lowerScoreByAlternateName();
+            System.out.println();
         }
     }
     private void setCorrectName(CorrectedAddress correctedAddress, Node node) {

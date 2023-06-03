@@ -95,4 +95,30 @@ public class HandmadeAddressTests {
 
         assertAddress(inputAddress, expectedAddress);
     }
+
+    @Test
+    void givenTwoCities_whenOneIsCountryCityStateAndOtherIsStateCity_thenShouldReturnTheOneWithMostMatches() {
+        //luxembourg is a city, state and also country -> 3 matches
+        //iasi is a city and state -> 2 matches
+        String countryField = "-";
+        String stateField = "-";
+        String cityField = "luxembourg iasi";
+
+        Address inputAddress = new Address(countryField, stateField, cityField);
+        Address expectedAddress = new Address("Grand Duchy of Luxembourg", "Luxembourg", "Luxembourg");
+
+        assertAddress(inputAddress, expectedAddress);
+    }
+
+    @Test
+    void givenTwoEqualScoringAddresses_whenOneIsNotAlternateName_thenShouldReturnThatAddress() {
+        String countryField = "România";
+        String stateField = "iasi Vaslui";
+        String cityField = "-";
+
+        Address inputAddress = new Address(countryField, stateField, cityField);
+        Address expectedAddress = new Address("România", "Vaslui", "Vaslui");
+
+        assertAddress(inputAddress, expectedAddress);
+    }
 }
