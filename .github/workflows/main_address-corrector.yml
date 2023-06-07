@@ -20,12 +20,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: '17'
-
-      - name: Set maximum heap space
-        env:
-          JAVA_TOOL_OPTIONS: -Xmx4g 
-
+          
       - name: Build with Maven
+        env:
+          JAVA_TOOL_OPTIONS: -Xmx4g
         run: mvn clean install
         working-directory: ./AddressCorrector
 
@@ -53,6 +51,6 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'address-corrector'
-          slot-name: 'Prod'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9220A79896E04BA2917B24D7C6495BEB }}
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_7D8EEB8B3EF94102865D79055930BEC4 }}
           package: '*.jar'
