@@ -7,6 +7,9 @@ import ro.uaic.info.AddressCorrector.models.NormalizedAddress;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class used to normalize an input address.
+ */
 public class Normalizer {
     private List<FieldNormalizer> normalizerInstances;
     private Address address;

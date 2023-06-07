@@ -20,6 +20,10 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class that initializes the data from the files. The files are downloaded from an azure storage container, and then the hierarchy
+ * is created.
+ */
 @Configuration
 @Log4j2
 public class DBInitializer implements CommandLineRunner {
@@ -32,7 +36,6 @@ public class DBInitializer implements CommandLineRunner {
     private Node createNewNode(String id) {
         Node node = new Node();
         idToNodeMap.put(id, node);
-
         return node;
     }
 
@@ -58,6 +61,11 @@ public class DBInitializer implements CommandLineRunner {
         parentNode.addChildNode(childNode);
     }
 
+    /**
+     * This method uses the file from {@link DBInitializer#allEntitiesFileName} to get all the information about the entities.
+     * The file contains the official name, the ascii name and all the alternate names for each entity.
+     * This method maps all the names to the corresponding node.
+     */
     @Bean
     public void parseAllEntities() {
         ResponseEntity<Resource> exchange = restTemplate.exchange(allEntitiesFileName, HttpMethod.GET, null, Resource.class);
@@ -79,6 +87,10 @@ public class DBInitializer implements CommandLineRunner {
         }
     }
 
+    /**
+     * This method uses the file from {@link DBInitializer#hierarchyFileName} to create the hierarchy between the entities.
+     * The file contains the id of the parent and the id of the child. In order to connect them, the {@link Node#addChildNode(Node)} is used.
+     */
     public void createGraph() {
         ResponseEntity<Resource> exchange = restTemplate.exchange(hierarchyFileName, HttpMethod.GET, null, Resource.class);
         try (BufferedReader in = new BufferedReader(new InputStreamReader(exchange.getBody().getInputStream()))) {            String line;
@@ -91,6 +103,10 @@ public class DBInitializer implements CommandLineRunner {
         }
     }
 
+    /**
+     * This method assigns the type of each node. The type is assigned based on the level of the node in the hierarchy.
+     * @param node the Node object that will have its type assigned
+     */
     private void assignType(Node node) {
         if (!node.isValid()) {
             node.setType(NodeType.INVALID);

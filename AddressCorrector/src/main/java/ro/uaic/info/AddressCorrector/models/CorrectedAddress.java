@@ -3,6 +3,11 @@ package ro.uaic.info.AddressCorrector.models;
 import lombok.Getter;
 import lombok.ToString;
 
+/**
+ * This class represents a corrected address.
+ * Apart from the fields inherited from Address, it also contains a score field.
+ * Also, it contains methods for lowering the score.
+ */
 @ToString(callSuper = true)
 @Getter
 public class CorrectedAddress extends Address {
