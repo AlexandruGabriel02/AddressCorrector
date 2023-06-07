@@ -52,5 +52,5 @@ jobs:
         with:
           app-name: 'address-corrector'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_7D8EEB8B3EF94102865D79055930BEC4 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_2CADE8BE96FF46A1AFFCD2C98664A87F }}
           package: '*.jar'
