@@ -33,7 +33,6 @@ public class AddressCorrector {
         List<CorrectedAddress> correctedAddresses = new ArrayList<>();
 
         for (Entry city : normalizedAddress.getCities()) {
-            //TODO: check why there are blank cities
             if (city.getName().isBlank())
                 break;
 
@@ -62,7 +61,6 @@ public class AddressCorrector {
         }
         if (!entry.getName().equalsIgnoreCase(node.getDefaultEntityName())) {
             correctedAddress.lowerScoreByAlternateName();
-            System.out.println();
         }
     }
     private void setCorrectName(CorrectedAddress correctedAddress, Node node) {
