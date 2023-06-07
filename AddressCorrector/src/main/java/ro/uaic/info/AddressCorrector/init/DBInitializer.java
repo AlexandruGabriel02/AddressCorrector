@@ -6,11 +6,17 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 import ro.uaic.info.AddressCorrector.database.MultimapDatabase;
 import ro.uaic.info.AddressCorrector.database.Node;
 import ro.uaic.info.AddressCorrector.models.NodeType;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,8 +25,9 @@ import java.util.Map;
 public class DBInitializer implements CommandLineRunner {
     private Map<String, Node> idToNodeMap = new HashMap<>();
     private Multimap<String, Node> tokenToNodeHashmap = HashMultimap.create();
-    private final static String allEntitiesFileName = "src/main/resources/data/allEuropeanEntities.txt";
-    private final static String hierarchyFileName = "src/main/resources/data/secondLevelHierarchy.txt";
+    private final static String allEntitiesFileName = "https://addresscorrectorstorage.blob.core.windows.net/data/allEntities.txt";
+    private final static String hierarchyFileName = "https://addresscorrectorstorage.blob.core.windows.net/data/secondLevelHierarchy.txt";
+    private final RestTemplate restTemplate = new RestTemplate();
 
     private Node createNewNode(String id) {
         Node node = new Node();
@@ -30,7 +37,7 @@ public class DBInitializer implements CommandLineRunner {
     }
 
     private void mapNameToNode(Node node, String name) {
-        if(name.isEmpty()) {
+        if (name.isEmpty()) {
             return;
         }
         tokenToNodeHashmap.put(name.toLowerCase(), node);
@@ -53,7 +60,8 @@ public class DBInitializer implements CommandLineRunner {
 
     @Bean
     public void parseAllEntities() {
-        try(BufferedReader in = new BufferedReader(new FileReader(allEntitiesFileName))) {
+        ResponseEntity<Resource> exchange = restTemplate.exchange(allEntitiesFileName, HttpMethod.GET, null, Resource.class);
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(exchange.getBody().getInputStream()))) {
             String line;
             while ((line = in.readLine()) != null) {
                 String[] tokens = line.split("\t");
@@ -66,21 +74,19 @@ public class DBInitializer implements CommandLineRunner {
 
                 setAlternateNames(createdNode, tokens[3]);
             }
-        }
-        catch(IOException e) {
+        } catch (IOException e) {
             log.error("IO exception at database creation: " + e.getMessage());
         }
     }
 
     public void createGraph() {
-        try(BufferedReader in = new BufferedReader(new FileReader(hierarchyFileName))) {
-            String line;
+        ResponseEntity<Resource> exchange = restTemplate.exchange(hierarchyFileName, HttpMethod.GET, null, Resource.class);
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(exchange.getBody().getInputStream()))) {            String line;
             while ((line = in.readLine()) != null) {
                 String[] ids = line.split("\t");
                 connectNodes(ids[0], ids[1]);
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             log.error("IO exception at graph creation: " + e.getMessage());
         }
     }
